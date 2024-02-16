@@ -1,1 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Pong Game</title>
+	<style>
+		canvas {
+			background-color: black;
+			display: block;
+			margin: auto;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="gameCanvas" width="800" height="400"></canvas>
+	<script>
+		// Constants
+const WALL_SIZE = 10;
+const PADDLE_WIDTH = 10;
+const PADDLE_HEIGHT = 100;
+const BALL_SIZE = 10;
+
+// Variables
+let canvas, canvasContext;
+let ballX = 50;
+let ballY = 50;
+let ballSpeedX = 10;
+let ballSpeedY = 4;
+let player1Y = 250;
+
+function calculateMousePos(event) {
+    let rect = canvas.getBoundingClientRect();
+    let root = document.documentElement;
+    let mouseX = event.clientX - rect.left - root.scrollLeft;
+    let mouseY = event.clientY - rect.top - root.scrollTop;
+    return {
+        x: mouseX,
+        y: mouseY
+    };
+}
+
+window.onload = function() {
+    canvas = document.getElementById('gameCanvas');
+    canvasContext = canvas.getContext('2d');
+
+    let framesPerSecond = 30;
+    setInterval(function() {
+        moveEverything();
+        drawEverything();
+    }, 1000/framesPerSecond);
+
+    canvas.addEventListener('mousemove', function(event) {
+        let mousePos = calculateMousePos(event);
+        player1Y = mousePos.y - (PADDLE_HEIGHT/2);
+    });
+};
+
+function ballReset() {
+    ballX = canvas.width/2;
+    ballY = canvas.height/2;
+    ballSpeedX = -ballSpeedX;
+}
+
+function moveEverything() {
+    ballX += ballSpeedX;
+    ballY += ballSpeedY;
+
+    if (ballX < 0) {
+        if (ballY > player1Y && ballY < player1Y+PADDLE_HEIGHT) {
+            ballSpeedX = -ballSpeedX;
+        } else {
+            ballReset();
+        }
+    }
+
+    if (ballX > canvas.width) {
+        ballSpeedX = -ballSpeedX;
+    }
+
+    if (ballY < 0 || ballY > canvas.height) {
+        ballSpeedY = -ballSpeedY;
+    }
+}
+
+function drawEverything() {
+    // Clear canvas
+    canvasContext.fillStyle = 'black';
+    canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw paddle
+    canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(0, player1Y, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+    // Draw ball
+    canvasContext.fillStyle = 'white';
+    canvasContext.beginPath();
+    canvasContext.arc(ballX, ballY, BALL_SIZE, 0, Math.PI*2, true);
+    canvasContext.fill();
+}
+
+	</script>
+</body>
+</html>
 
